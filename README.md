@@ -2,7 +2,7 @@
 
 | **Objects** | **Messages**        |
 |-------------|---------------------|
-| Card        | money               |
+| Oystercard  | money               |
 |             | add_money           |
 |             | money_limit         |
 |             | deduct_money        |
