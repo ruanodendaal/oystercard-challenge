@@ -2,17 +2,17 @@
 
 | **Objects** | **Messages**        |
 |-------------|---------------------|
-| Oystercard  | money               |
-|             | add_money           |
-|             | money_limit         |
-|             | deduct_money        |
+| Oystercard  | balance             |
+|             | top_up              |
+|             | maximum_balance     |
+|             | deduct              |
 | Fare        | fare_cost           |
 |             | minimum_amount      |
 |             | penalty_charge      |
 |             | total_journey_amount|
 | Card        | touch_in            |
 |             | touch_out           |
-| Journey     | complete?           |
+| Journey     | in_journey?         |
 |             | start               |
 |             | end                 |
 |             | history             |
