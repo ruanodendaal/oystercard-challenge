@@ -4,6 +4,7 @@ describe Journey do
 subject(:journey) {described_class.new}
 let(:entry_station) {double(:entry_station)}
 let(:exit_station) {double(:exit_station)}
+let(:oystercard) {double(:oystercard)}
 
   describe '#initialization' do
     subject(:journey) {described_class.new(:entry_station)}
@@ -21,7 +22,15 @@ let(:exit_station) {double(:exit_station)}
       it 'should return minimum fare' do
         expect(journey.fare).to eq Oystercard::MINIMUM_FARE
       end
-    end   
+      it 'should return a penalty fare of 6 if you\'ve already touched in' do
+        allow(oystercard).to receive(:top_up) 
+          oystercard.top_up(10)
+        allow(oystercard).to receive(:touch_in)
+          2.times {oystercard.touch_in(entry_station)}
+          expect(journey.fare).to eq 6
+        end
+
+    end
 
   end
 
