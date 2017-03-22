@@ -1,9 +1,9 @@
 require 'oystercard'
 
 describe Oystercard do
-  subject(:oystercard) {described_class.new}
-  let (:entry_station) {double(:entry_station)}
-  let (:exit_station) {double(:exit_station)}
+  subject(:oystercard) { described_class.new}
+  let (:entry_station) { double :entry_station }
+  let (:exit_station) { double :exit_station }
 
   describe '#initialization' do
     it "new card has zero balance" do
@@ -40,9 +40,9 @@ describe Oystercard do
         oystercard.touch_in(:entry_station)
       end
 
-        it "returns the station where journey begins" do
-          expect(oystercard.entry_station).to eq :entry_station
-        end
+      it "returns the station where journey begins" do
+        expect(oystercard.entry_station).to eq :entry_station
+      end
     end
   end
 
@@ -53,26 +53,25 @@ describe Oystercard do
           oystercard.touch_in(:entry_station)
         end
 
-          it 'should respond to touch_out' do
-            oystercard.touch_out(:exit_station)
-            expect(oystercard).not_to be_in_journey
-          end
+        it 'should respond to touch_out' do
+          oystercard.touch_out(:exit_station)
+          expect(oystercard).not_to be_in_journey
+        end
 
-          it 'should deduct the correct amount' do
-            min_fare = Oystercard::MINIMUM_FARE
-            expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
-          end
+        it 'should deduct the correct amount' do
+          min_fare = Oystercard::MINIMUM_FARE
+          expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
+        end
 
-          it "sets the entry station to nil on touch_out" do
-            oystercard.touch_out(:exit_station)
-            expect(oystercard.entry_station).to eq nil
-          end
+        it "sets the entry station to nil on touch_out" do
+          oystercard.touch_out(:exit_station)
+          expect(oystercard.entry_station).to eq nil
+        end
 
-          it "returns the journey's exit station" do
-            oystercard.touch_out(:exit_station)
-            expect(oystercard.exit_station).to eq :exit_station
-          end
-
+        it "returns the journey's exit station" do
+          oystercard.touch_out(:exit_station)
+          expect(oystercard.exit_station).to eq :exit_station
+        end
       end
     end
 
@@ -105,18 +104,21 @@ describe Oystercard do
     end
   end
 
-  describe 'journey history' do
-      it 'stores a completed journey' do
-        expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
-      end
-  end
-
-  describe 'journey tracking' do
-    it 'should be complete when touching out after touching in' do
+  describe '#log_journey' do
+    before do
       oystercard.top_up(20)
       oystercard.touch_in(:entry_station)
       oystercard.touch_out(:exit_station)
-      expect(oystercard.new_journey).to be_complete
+    end
+
+    it 'stores a single journey history' do
+      expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
+    end
+
+    it 'should store multiple journeys' do
+      oystercard.touch_in(:entry_station)
+      oystercard.touch_out(:exit_station)
+      expect(oystercard.journey_history.length).to eq 2
     end
   end
 
