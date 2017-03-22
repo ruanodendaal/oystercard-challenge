@@ -1,19 +1,24 @@
+# respondible for start & end, complete?
+# storing each journey in journey_history
+
 class Journey
 
-attr_reader :entry_station, :complete
+attr_reader :station, :complete, :current_journey
 
-  def initialize(entry_station)
-    @entry_station = entry_station
+  def initialize(station=nil)
     @complete = false
-    # @exit_station = exit_station
+    @current_journey = {}
   end
 
-  #TODO
-  # def start
-  # end
-  #
-  # def end_journey
-  # end
+
+  def start(station)
+    self.current_journey = {:entry_station => station}
+  end
+
+  def end_journey(station)
+    self.current_journey[:exit_station] = station
+    # self.complete = true
+  end
 
 
   def finish
@@ -30,6 +35,6 @@ attr_reader :entry_station, :complete
   # end
 
   private
-  attr_writer :complete
+  attr_writer :complete, :current_journey
 
 end
