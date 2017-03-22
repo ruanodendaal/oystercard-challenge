@@ -26,17 +26,19 @@ let(:oystercard) {double(:oystercard)}
   end
 
   describe '#end_journey'do
-    it 'should add the exit station to the existing hash' do
+    before do
       journey.end_journey(:exit_station)
+    end
+
+    it 'should add the exit station to the existing hash' do
       expect(journey.current_journey).to include {{:exit_station => exit_station}}
+    end
+
+    it 'should mark journey as completed' do
+      expect(journey.complete).to be_truthy
     end
   end
 
-  describe '#finish' do
-    it 'should complete true when called' do
-      expect(journey.finish). to eq true
-    end
-  end
 
   describe '#complete?' do
     it 'should return true if journey is completed' do

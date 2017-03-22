@@ -3,13 +3,12 @@
 
 class Journey
 
-attr_reader :station, :complete, :current_journey
+attr_reader :complete, :current_journey
 
   def initialize(station=nil)
     @complete = false
     @current_journey = {}
   end
-
 
   def start(station)
     self.current_journey = {:entry_station => station}
@@ -17,11 +16,6 @@ attr_reader :station, :complete, :current_journey
 
   def end_journey(station)
     self.current_journey[:exit_station] = station
-    # self.complete = true
-  end
-
-
-  def finish
     self.complete = true
   end
 
