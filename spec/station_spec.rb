@@ -11,4 +11,5 @@ subject(:station) { described_class.new("Aldgate", 1) }
       expect(station.zone).to eq 1
     end
 
+
 end

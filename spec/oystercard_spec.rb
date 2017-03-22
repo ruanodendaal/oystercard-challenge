@@ -6,14 +6,12 @@ describe Oystercard do
   let (:exit_station) {double(:exit_station)}
 
   describe '#initialization' do
-    it 'should initialize card as not in a journey' do
-      expect(oystercard.in_journey?).to eq false
-    end
     it "new card has zero balance" do
       expect(oystercard.balance).to eq(0)
     end
-    it "creates and empty journeys array" do
-      expect(oystercard.journeys).to be_empty
+
+    it "creates and empty journey history array" do
+      expect(oystercard.journey_history).to be_empty
     end
   end
 
@@ -34,62 +32,50 @@ describe Oystercard do
     end
   end
 
-describe "#in_journey" do
-    it "should respond to to in_journey" do
-      expect(oystercard).to respond_to(:in_journey)
+
+  describe "#touch_in" do
+    context 'when card has enough balance for the complete journey' do
+      before(:each) do
+        oystercard.top_up(10)
+        oystercard.touch_in(:entry_station)
+      end
+
+        it "returns the station where journey begins" do
+          expect(oystercard.entry_station).to eq :entry_station
+        end
     end
   end
-
-  context 'when card has enough balance for the complete journey' do
-    before(:each) do
-      oystercard.top_up(10)
-      oystercard.touch_in(:entry_station)
-    end
-
-    describe "#touch_in" do
-      it "should respond to touch_in" do
-        expect(oystercard).to be_in_journey
-      end
-
-      it "should take station as an argument" do
-        expect{oystercard.touch_in(:entry_station)}.not_to raise_error
-      end
-
-      it "returns the station where journey begins" do
-        expect(oystercard.entry_station).to eq :entry_station
-      end
-    end
 
     describe "#touch_out" do
-      before do
-        oystercard.touch_out(:exit_station)
-      end
+      context 'when card has enough balance for the complete journey' do
+        before(:each) do
+          oystercard.top_up(10)
+          oystercard.touch_in(:entry_station)
+        end
 
-      it 'should respond to touch_out' do
-        expect(oystercard).not_to be_in_journey
-      end
+          it 'should respond to touch_out' do
+            oystercard.touch_out(:exit_station)
+            expect(oystercard).not_to be_in_journey
+          end
 
-      it 'should deduct the correct amount' do
-        min_fare = Oystercard::MINIMUM_FARE
-        expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
-      end
+          it 'should deduct the correct amount' do
+            min_fare = Oystercard::MINIMUM_FARE
+            expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
+          end
 
-      it "sets the entry station to nil on touch_out" do
-        expect(oystercard.entry_station).to eq nil
-      end
+          it "sets the entry station to nil on touch_out" do
+            oystercard.touch_out(:exit_station)
+            expect(oystercard.entry_station).to eq nil
+          end
 
-      it "returns the journey's exit station" do
-        expect(oystercard.exit_station).to eq :exit_station
+          it "returns the journey's exit station" do
+            oystercard.touch_out(:exit_station)
+            expect(oystercard.exit_station).to eq :exit_station
+          end
+
       end
     end
 
-    let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
-    it 'stores a completed journey' do
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out(exit_station)
-      expect(oystercard.journeys).to include journey
-    end
-  end
 
   context 'when card hase a balance of 0' do
     describe  "#touch_in" do
@@ -99,5 +85,40 @@ describe "#in_journey" do
       end
     end
   end
+
+  context 'if journey not started correctly' do
+    describe '#touch_out' do
+      it 'should raise error if not touched in' do
+        oystercard.top_up(50)
+        expect { oystercard.touch_out(:exit_station) }.to raise_error "Error you did not touch in"
+      end
+    end
+  end
+
+  context 'if journey not ended correctly' do
+    describe '#touch_in' do
+      it 'raises an error if already touched in' do
+        oystercard.top_up(20)
+        oystercard.touch_in(:entry_station)
+        expect { oystercard.touch_in(:entry_station) }.to raise_error "Error, already touched in"
+      end
+    end
+  end
+
+  describe 'journey history' do
+      it 'stores a completed journey' do
+        expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
+      end
+  end
+
+  describe 'journey tracking' do
+    it 'should be complete when touching out after touching in' do
+      oystercard.top_up(20)
+      oystercard.touch_in(:entry_station)
+      oystercard.touch_out(:exit_station)
+      expect(oystercard.new_journey).to be_complete
+    end
+  end
+
 
 end
