@@ -40,62 +40,19 @@ describe Oystercard do
         oystercard.touch_in(:entry_station)
       end
 
-      it "returns the station where journey begins" do
-        expect(oystercard.entry_station).to eq :entry_station
-      end
-    end
-  end
-
-    describe "#touch_out" do
-      context 'when card has enough balance for the complete journey' do
-        before(:each) do
-          oystercard.top_up(10)
-          oystercard.touch_in(:entry_station)
-        end
-
-        it 'should respond to touch_out' do
-          oystercard.touch_out(:exit_station)
-          expect(oystercard).not_to be_in_journey
-        end
-
-        it 'should deduct the correct amount' do
-          min_fare = Oystercard::MINIMUM_FARE
-          expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
-        end
-
-        it "sets the entry station to nil on touch_out" do
-          oystercard.touch_out(:exit_station)
-          expect(oystercard.entry_station).to eq nil
-        end
-
-        it "returns the journey's exit station" do
-          oystercard.touch_out(:exit_station)
-          expect(oystercard.exit_station).to eq :exit_station
-        end
+      it "is expected to be in_journey" do
+        expect(oystercard).to be_in_journey
       end
     end
 
-
-  context 'when card hase a balance of 0' do
-    describe  "#touch_in" do
+    context 'when card hase a balance of 0' do
       it "restricts start of journey if minimum balance not met" do
         min_balance = Oystercard::MIN_BALANCE
         expect { oystercard.touch_in(:entry_station) }.to raise_error "Cannot start journey. Minimum balance required is £#{min_balance}"
       end
     end
-  end
 
-  context 'if journey not started correctly' do
-    describe '#touch_out' do
-      it 'should raise error if not touched in' do
-        oystercard.top_up(50)
-        expect { oystercard.touch_out(:exit_station) }.to raise_error "Error you did not touch in"
-      end
-    end
-  end
-
-  context 'if journey not ended correctly' do
-    describe '#touch_in' do
+    context 'if journey not ended correctly' do
       it 'raises an error if already touched in' do
         oystercard.top_up(20)
         oystercard.touch_in(:entry_station)
@@ -104,21 +61,41 @@ describe Oystercard do
     end
   end
 
-  describe '#log_journey' do
-    before do
-      oystercard.top_up(20)
-      oystercard.touch_in(:entry_station)
-      oystercard.touch_out(:exit_station)
+  describe "#touch_out" do
+    context 'when card has balance for the complete journey' do
+      before(:each) do
+        oystercard.top_up(10)
+        oystercard.touch_in(:entry_station)
+        oystercard.touch_out(:exit_station)
+      end
+
+      it 'should not be in journey' do
+        expect(oystercard).not_to be_in_journey
+      end
+
+      it 'stores a single journey history' do
+        expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
+      end
+
+      it 'should store multiple journeys' do
+        oystercard.touch_in(:entry_station)
+        oystercard.touch_out(:exit_station)
+        expect(oystercard.journey_history.length).to eq 2
+      end
     end
 
-    it 'stores a single journey history' do
-      expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
+    it 'should deduct the correct amount' do
+      min_fare = Oystercard::MINIMUM_FARE
+      oystercard.top_up(10)
+      oystercard.touch_in(:entry_station)
+      expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
     end
 
-    it 'should store multiple journeys' do
-      oystercard.touch_in(:entry_station)
-      oystercard.touch_out(:exit_station)
-      expect(oystercard.journey_history.length).to eq 2
+    context 'if journey not started correctly' do
+      it 'should raise error if not touched in' do
+        oystercard.top_up(50)
+        expect { oystercard.touch_out(:exit_station) }.to raise_error "Error you did not touch in"
+      end
     end
   end
 
