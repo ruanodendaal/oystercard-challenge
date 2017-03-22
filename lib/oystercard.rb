@@ -25,10 +25,7 @@ class Oystercard
   def touch_out(exit_station)
     deduct(MINIMUM_FARE)
     self.exit_station = exit_station
-    # journeys << {:entry_station => entry_station, :exit_station => exit_station}
-    # puts "======"
-    # puts journeys
-    # puts "++++++"
+    journeys << {:entry_station => entry_station, :exit_station => exit_station}
     self.entry_station = nil
   end
 

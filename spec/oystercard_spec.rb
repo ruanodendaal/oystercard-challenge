@@ -83,10 +83,11 @@ describe "#in_journey" do
       end
     end
 
-    let(:journeys){ {entry_station: entry_station, exit_station: exit_station} }
-    xit 'stores completed journeys' do
-      oystercard.touch_out(:exit_station)
-      expect(oystercard.journeys).to include journeys
+    let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
+    it 'stores a completed journey' do
+      oystercard.touch_in(entry_station)
+      oystercard.touch_out(exit_station)
+      expect(oystercard.journeys).to include journey
     end
   end
 
