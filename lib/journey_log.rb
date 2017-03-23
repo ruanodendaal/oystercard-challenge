@@ -17,7 +17,7 @@ class JourneyLog
   def start(entry_station)
     self.new_journey = Journey.new
     new_journey.start(entry_station)
-    self.journey_history << new_journey.current_journey #Pushing the history from journey
+    self.journey_history << new_journey.current_journey
   end
 
   def end(exit_station)
