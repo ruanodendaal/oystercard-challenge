@@ -51,7 +51,6 @@ class Oystercard
     !!new_journey
   end
 
-
   private
 
   attr_writer :balance, :new_journey
