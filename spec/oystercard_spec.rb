@@ -9,10 +9,6 @@ describe Oystercard do
     it "new card has zero balance" do
       expect(oystercard.balance).to eq(0)
     end
-
-    it "creates and empty journey history array" do
-      expect(oystercard.journey_history).to be_empty
-    end
   end
 
   describe '#top_up' do
@@ -84,15 +80,6 @@ describe Oystercard do
         expect(oystercard).not_to be_in_journey
       end
 
-      it 'stores a single journey history' do
-        expect(oystercard.journey_history).to include { {entry_station: entry_station, exit_station: exit_station} }
-      end
-
-      it 'should store multiple journeys' do
-        oystercard.touch_in(:entry_station)
-        oystercard.touch_out(:exit_station)
-        expect(oystercard.journey_history.length).to eq 2
-      end
     end
 
     it 'should deduct the correct amount' do

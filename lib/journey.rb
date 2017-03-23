@@ -29,6 +29,7 @@ attr_reader :complete, :current_journey
   # end
 
   private
+  
   attr_writer :complete, :current_journey
 
 end
