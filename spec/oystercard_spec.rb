@@ -52,19 +52,30 @@ describe Oystercard do
       end
     end
 
-    context 'if journey not ended correctly' do
-      it 'raises an error if already touched in' do
-        oystercard.top_up(20)
+    # context 'if journey not ended correctly' do
+    #   it 'raises an error if already touched in' do
+    #     oystercard.top_up(20)
+    #     oystercard.touch_in(:entry_station)
+    #     expect { oystercard.touch_in(:entry_station) }.to raise_error "Error, already touched in"
+    #   end
+    # end
+
+    context "when we try to touch_in with an incomplete journey"  do
+      it 'should charge a penalty_charge' do
+        oystercard.top_up(10)
         oystercard.touch_in(:entry_station)
-        expect { oystercard.touch_in(:entry_station) }.to raise_error "Error, already touched in"
+        penalty = Oystercard::PENTALTY_CHARGE
+        expect{ oystercard.touch_in(:entry_station) }.to change { oystercard.balance }.by -penalty
       end
     end
   end
 
   describe "#touch_out" do
+    before do
+      oystercard.top_up(10)
+    end
     context 'when card has balance for the complete journey' do
       before(:each) do
-        oystercard.top_up(10)
         oystercard.touch_in(:entry_station)
         oystercard.touch_out(:exit_station)
       end
@@ -86,18 +97,24 @@ describe Oystercard do
 
     it 'should deduct the correct amount' do
       min_fare = Oystercard::MINIMUM_FARE
-      oystercard.top_up(10)
       oystercard.touch_in(:entry_station)
       expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -min_fare
     end
 
-    context 'if journey not started correctly' do
-      it 'should raise error if not touched in' do
-        oystercard.top_up(50)
-        expect { oystercard.touch_out(:exit_station) }.to raise_error "Error you did not touch in"
-      end
+    it "checks penalty charge is deducated when forget to touch in" do
+      expect{ oystercard.touch_out(:exit_station) }.to change {oystercard.balance}.by -Oystercard::PENTALTY_CHARGE
+
+
     end
+    #
+    # context 'if journey not started correctly' do
+    #   it 'should raise error if not touched in' do
+    #     oystercard.top_up(50)
+    #     expect { oystercard.touch_out(:exit_station) }.to raise_error "Error you did not touch in"
+    #   end
+    # end
   end
+
 
 
 end

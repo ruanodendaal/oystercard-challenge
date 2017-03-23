@@ -1,3 +1,5 @@
+# managing a list of stations & zones
+
 class Station
   attr_reader :name, :zone
 
